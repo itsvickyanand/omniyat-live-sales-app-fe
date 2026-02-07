@@ -12,16 +12,16 @@ export default function DashboardLayout({ children }) {
             Dashboard Home
           </Link>
           <Link className="hover:text-blue-600" href="/dashboard/categories">
-            Categories
+            Manage Categories
           </Link>
           <Link className="hover:text-blue-600" href="/dashboard/products">
-            Products
+            Manage Products
           </Link>
           <Link className="hover:text-blue-600" href="/dashboard/orders">
-            Orders
+            Manage Orders
           </Link>
           <Link className="hover:text-blue-600" href="/dashboard/orders/new">
-            Create order
+            Create POS/Admin order
           </Link>
         </nav>
       </aside>

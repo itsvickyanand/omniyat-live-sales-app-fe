@@ -22,3 +22,8 @@ export const markOrderPaid = (id, payload) =>
     method: "PUT",
     body: JSON.stringify(payload),
   });
+
+export const deleteOrder = (id) =>
+  api(`/api/order/delete/${id}`, {
+    method: "DELETE",
+  });

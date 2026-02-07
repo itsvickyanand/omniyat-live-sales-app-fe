@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { cancelOrder, getAllOrders, markOrderPaid } from "@/lib/order.api";
+import {
+  cancelOrder,
+  deleteOrder,
+  getAllOrders,
+  markOrderPaid,
+} from "@/lib/order.api";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -33,6 +38,26 @@ export default function OrdersPage() {
       await cancelOrder(orderId);
       await fetchOrders();
       alert("Order cancelled ✅");
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    if (
+      !confirm(
+        "Delete this order permanently? Stock will be restored if needed."
+      )
+    )
+      return;
+
+    try {
+      setLoading(true);
+      await deleteOrder(orderId);
+      await fetchOrders();
+      alert("Order deleted ✅");
     } catch (err) {
       alert(err.message);
     } finally {
@@ -72,7 +97,7 @@ export default function OrdersPage() {
         <div>
           <h2 className="text-2xl font-bold">Orders</h2>
           <p className="text-gray-600 text-sm">
-            Manage POS orders (cancel / mark paid) ✅
+            Manage POS orders (cancel / mark paid / delete) ✅
           </p>
         </div>
 
@@ -106,7 +131,7 @@ export default function OrdersPage() {
                   <div className="mt-2 text-sm">
                     <p className="font-semibold">{o?.Product?.name || "N/A"}</p>
                     <p className="text-gray-600 text-xs">
-                      Qty: <b>{o.quantity}</b> • Amount: <b>₹{o.amount}</b>
+                      Qty: <b>{o.quantity}</b> • Amount: <b>AED {o.amount}</b>
                     </p>
                   </div>
                 </div>
@@ -140,6 +165,8 @@ export default function OrdersPage() {
                   o.paymentStatus,
                   o.paymentStatus === "PAID"
                     ? "bg-green-100 text-green-700"
+                    : o.paymentStatus === "FAILED"
+                    ? "bg-red-100 text-red-700"
                     : "bg-yellow-100 text-yellow-800"
                 )}
 
@@ -152,7 +179,9 @@ export default function OrdersPage() {
                   Customer: <b>{o.customerName || "Walk-in"}</b>
                 </p>
                 {o.customerPhone && <p>Phone: {o.customerPhone}</p>}
+                {o.customerPhone && <p>Phone: {o.customerEmail}</p>}
                 {o.paymentMethod && <p>Method: {o.paymentMethod}</p>}
+
                 {o.paymentRef && <p>Ref: {o.paymentRef}</p>}
               </div>
 
@@ -177,6 +206,14 @@ export default function OrdersPage() {
                     Cancel
                   </button>
                 )}
+
+                <button
+                  onClick={() => handleDeleteOrder(o.id)}
+                  disabled={loading}
+                  className="flex-1 px-3 py-2 rounded-xl text-sm bg-black text-white hover:opacity-90 disabled:opacity-50"
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))}

@@ -10,6 +10,7 @@ export const uploadMultipleToAzure = async (files) => {
   // ✅ 1) get SAS URLs from backend
   const res = await fetch(`${BACKEND}/api/upload/sas`, {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },

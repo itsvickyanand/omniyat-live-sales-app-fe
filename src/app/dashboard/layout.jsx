@@ -238,7 +238,7 @@ export default function DashboardLayout({ children }) {
           {/* Logout */}
           <button
             onClick={handleLogout}
-            className=" text-red-600 hover:text-red-800 text-center mt-4 border-1"
+            className="text-red-600 hover:text-red-800 text-center mt-4 border-1"
             p-2
           >
             Logout

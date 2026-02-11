@@ -74,6 +74,7 @@ export default function CheckoutPage() {
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/order/create`,
       {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           productId,
@@ -100,6 +101,7 @@ export default function CheckoutPage() {
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payment/ccavenue/initiate`,
       {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId }),
       }

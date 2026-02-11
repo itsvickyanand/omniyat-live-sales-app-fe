@@ -36,6 +36,7 @@ export default function PaymentStatusPage() {
 
         const res = await fetch(`${API_BASE}/api/order/detail/${orderId}`, {
           signal: controller.signal,
+          credentials: "include",
           cache: "no-store",
         });
 

@@ -3,6 +3,7 @@ export const deleteFromAzure = async (fileUrl) => {
 
   const res = await fetch(`${BACKEND}/api/upload/delete-sas`, {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ fileUrl }),
   });

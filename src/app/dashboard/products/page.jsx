@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getAllCategories } from "@/lib/category.api";
 import { useRouter } from "next/navigation";
+
+import { getAllCategories } from "@/lib/category.api";
+import { getAllArtists } from "@/lib/artist.api";
 
 import {
   createProduct,
@@ -13,6 +15,7 @@ import {
 
 import { uploadMultipleToAzure } from "@/lib/azureUpload";
 import { deleteFromAzure } from "@/lib/azureDelete";
+
 import CreateProductForm from "./CreateProductForm";
 import ProductCard from "./ProductCard";
 
@@ -20,20 +23,25 @@ export default function ProductsPage() {
   const router = useRouter();
 
   const [categories, setCategories] = useState([]);
+  const [artists, setArtists] = useState([]);
   const [products, setProducts] = useState([]);
+
   const [loading, setLoading] = useState(false);
 
-  // CREATE FORM STATE
+  /*
+  =====================
+  CREATE STATE
+  =====================
+  */
 
   const [form, setForm] = useState({
     categoryId: "",
-    artistName: "",
+    artistId: "",
     name: "",
-    slug: "",
     description: "",
     size: "",
     weight: "",
-    donationPercentage: 50,
+    donationPercentage: "",
     deliveryInfo: "",
     address: "",
     installationInstructions: "",
@@ -44,23 +52,34 @@ export default function ProductsPage() {
 
   const [imageFiles, setImageFiles] = useState([]);
 
-  // EDIT STATE
+  /*
+  =====================
+  EDIT STATE
+  =====================
+  */
 
   const [editingId, setEditingId] = useState(null);
-
   const [editData, setEditData] = useState(null);
-
   const [newEditImages, setNewEditImages] = useState([]);
 
   const selectedEditingProduct = useMemo(() => {
     return products.find((p) => p.id === editingId) || null;
   }, [editingId, products]);
 
-  // FETCH
+  /*
+  =====================
+  FETCH DATA
+  =====================
+  */
 
   const fetchCategories = async () => {
     const res = await getAllCategories();
     setCategories(res.data || []);
+  };
+
+  const fetchArtists = async () => {
+    const res = await getAllArtists();
+    setArtists(res.data || []);
   };
 
   const fetchProducts = async () => {
@@ -72,27 +91,33 @@ export default function ProductsPage() {
     (async () => {
       setLoading(true);
       await fetchCategories();
+      await fetchArtists();
       await fetchProducts();
       setLoading(false);
     })();
   }, []);
 
-  // BUY NOW
+  /*
+  =====================
+  BUY NOW
+  =====================
+  */
 
   const handleBuyNow = (productId) => {
     router.push(`/dashboard/checkout?productId=${productId}&qty=1`);
   };
 
-  // CREATE PRODUCT
+  /*
+  =====================
+  CREATE PRODUCT
+  =====================
+  */
 
   const handleCreateProduct = async () => {
     if (!form.categoryId) return alert("Category required");
-    if (!form.artistName) return alert("Artist required");
+    if (!form.artistId) return alert("Artist required");
     if (!form.name) return alert("Name required");
-    if (!form.slug) return alert("Slug required");
-    if (!form.description) return alert("Description required");
     if (!form.price) return alert("Price required");
-    if (!form.stock) return alert("Stock required");
 
     if (imageFiles.length === 0) return alert("Please upload images");
 
@@ -105,12 +130,10 @@ export default function ProductsPage() {
         ...form,
         price: Number(form.price),
         stock: Number(form.stock),
-
         donationPercentage:
           form.donationPercentage === ""
             ? null
             : Number(form.donationPercentage),
-
         images: uploadedUrls,
         thumbnail: uploadedUrls[0],
       });
@@ -119,9 +142,8 @@ export default function ProductsPage() {
 
       setForm({
         categoryId: "",
-        artistName: "",
+        artistId: "",
         name: "",
-        slug: "",
         description: "",
         size: "",
         weight: "",
@@ -144,22 +166,19 @@ export default function ProductsPage() {
     }
   };
 
-  // START EDIT
-
-  // const handleStartEdit = (p) => {
-  //   setEditingId(p.id);
-  //   setEditData({ ...p });
-  //   setNewEditImages([]);
-  // };
+  /*
+  =====================
+  START EDIT
+  =====================
+  */
 
   const handleStartEdit = (p) => {
     setEditingId(p.id);
 
     setEditData({
       categoryId: p.categoryId,
-      artistName: p.artistName,
+      artistId: p.artistId,
       name: p.name,
-      slug: p.slug,
       description: p.description,
       size: p.size,
       weight: p.weight,
@@ -180,7 +199,11 @@ export default function ProductsPage() {
     setEditData(null);
   };
 
-  // UPDATE PRODUCT
+  /*
+  =====================
+  UPDATE PRODUCT
+  =====================
+  */
 
   const handleUpdateProduct = async () => {
     try {
@@ -190,21 +213,17 @@ export default function ProductsPage() {
 
       if (newEditImages.length > 0) {
         const newUrls = await uploadMultipleToAzure(newEditImages);
-
         finalImages = [...finalImages, ...newUrls];
       }
 
       await updateProduct(editingId, {
         ...editData,
-
         price: Number(editData.price),
         stock: Number(editData.stock),
-
         donationPercentage:
           editData.donationPercentage === ""
             ? null
             : Number(editData.donationPercentage),
-
         images: finalImages,
         thumbnail: finalImages[0],
       });
@@ -219,28 +238,12 @@ export default function ProductsPage() {
     }
   };
 
-  // DELETE IMAGE
+  /*
+  =====================
+  DELETE IMAGE
+  =====================
+  */
 
-  // const handleDeleteImage = async (productId, imgUrl) => {
-  //   try {
-  //     setLoading(true);
-
-  //     await deleteFromAzure(imgUrl);
-
-  //     const product = products.find((p) => p.id === productId);
-
-  //     const updatedImages = product.images.filter((i) => i !== imgUrl);
-
-  //     await updateProduct(productId, {
-  //       images: updatedImages,
-  //       thumbnail: updatedImages[0] || null,
-  //     });
-
-  //     await fetchProducts();
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const handleDeleteImage = async (productId, imgUrl) => {
     try {
       setLoading(true);
@@ -261,26 +264,23 @@ export default function ProductsPage() {
         thumbnail: updatedThumbnail,
       });
 
-      // ✅ UPDATE UI IMMEDIATELY (IMPORTANT FIX)
       setProducts((prev) =>
         prev.map((p) =>
           p.id === productId
-            ? {
-                ...p,
-                images: updatedImages,
-                thumbnail: updatedThumbnail,
-              }
+            ? { ...p, images: updatedImages, thumbnail: updatedThumbnail }
             : p
         )
       );
-    } catch (err) {
-      alert(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // DELETE PRODUCT
+  /*
+  =====================
+  DELETE PRODUCT
+  =====================
+  */
 
   const handleDeleteProduct = async (product) => {
     if (!confirm("Delete product?")) return;
@@ -288,7 +288,9 @@ export default function ProductsPage() {
     try {
       setLoading(true);
 
-      for (const img of product.images || []) await deleteFromAzure(img);
+      for (const img of product.images || []) {
+        await deleteFromAzure(img);
+      }
 
       await deleteProduct(product.id);
 
@@ -298,66 +300,412 @@ export default function ProductsPage() {
     }
   };
 
-  // UI
+  /*
+  =====================
+  UI
+  =====================
+  */
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-      {/* HEADER */}
-
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-semibold">Products</h1>
-
-          <p className="text-gray-500 text-sm">Manage artwork catalog</p>
-        </div>
-
-        {loading && (
-          <div className="text-sm bg-yellow-100 text-yellow-700 px-3 py-1 rounded">
-            Processing...
-          </div>
-        )}
-      </div>
-
       <CreateProductForm
         form={form}
         categories={categories}
+        artists={artists}
         imageFiles={imageFiles}
         handleCreateProduct={handleCreateProduct}
         setForm={setForm}
+        loading={loading}
         setImageFiles={setImageFiles}
       />
 
-      {/* PRODUCTS GRID */}
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {products
-          .filter((p) => Number(p.stock) > 0)
-          .map((p) => {
-            const editing = editingId === p.id;
-
-            return (
-              <div key={p.id}>
-                <ProductCard
-                  p={p}
-                  editing={editingId === p.id}
-                  editData={editData}
-                  setEditData={setEditData}
-                  newEditImages={newEditImages}
-                  setNewEditImages={setNewEditImages}
-                  handleDeleteImage={handleDeleteImage}
-                  handleUpdateProduct={handleUpdateProduct}
-                  handleCancelEdit={handleCancelEdit}
-                  handleBuyNow={handleBuyNow}
-                  handleStartEdit={handleStartEdit}
-                  handleDeleteProduct={handleDeleteProduct}
-                />
-              </div>
-            );
-          })}
+          .filter((p) => p.stock > 0)
+          .map((p) => (
+            <ProductCard
+              key={p.id}
+              p={p}
+              artists={artists}
+              editing={editingId === p.id}
+              editData={editData}
+              categories={categories}
+              setEditData={setEditData}
+              newEditImages={newEditImages}
+              setNewEditImages={setNewEditImages}
+              handleDeleteImage={handleDeleteImage}
+              handleUpdateProduct={handleUpdateProduct}
+              handleCancelEdit={handleCancelEdit}
+              handleBuyNow={handleBuyNow}
+              handleStartEdit={handleStartEdit}
+              handleDeleteProduct={handleDeleteProduct}
+            />
+          ))}
       </div>
     </div>
   );
 }
+
+// "use client";
+
+// import { useEffect, useMemo, useState } from "react";
+// import { getAllCategories } from "@/lib/category.api";
+// import { useRouter } from "next/navigation";
+
+// import {
+//   createProduct,
+//   deleteProduct,
+//   getAllProducts,
+//   updateProduct,
+// } from "@/lib/product.api";
+
+// import { uploadMultipleToAzure } from "@/lib/azureUpload";
+// import { deleteFromAzure } from "@/lib/azureDelete";
+// import CreateProductForm from "./CreateProductForm";
+// import ProductCard from "./ProductCard";
+
+// export default function ProductsPage() {
+//   const router = useRouter();
+
+//   const [categories, setCategories] = useState([]);
+//   const [products, setProducts] = useState([]);
+//   const [loading, setLoading] = useState(false);
+
+//   // CREATE FORM STATE
+
+//   const [form, setForm] = useState({
+//     categoryId: "",
+//     artistName: "",
+//     name: "",
+//     slug: "",
+//     description: "",
+//     size: "",
+//     weight: "",
+//     donationPercentage: 50,
+//     deliveryInfo: "",
+//     address: "",
+//     installationInstructions: "",
+//     price: "",
+//     stock: 1,
+//     isActive: true,
+//   });
+
+//   const [imageFiles, setImageFiles] = useState([]);
+
+//   // EDIT STATE
+
+//   const [editingId, setEditingId] = useState(null);
+
+//   const [editData, setEditData] = useState(null);
+
+//   const [newEditImages, setNewEditImages] = useState([]);
+
+//   const selectedEditingProduct = useMemo(() => {
+//     return products.find((p) => p.id === editingId) || null;
+//   }, [editingId, products]);
+
+//   // FETCH
+
+//   const fetchCategories = async () => {
+//     const res = await getAllCategories();
+//     setCategories(res.data || []);
+//   };
+
+//   const fetchProducts = async () => {
+//     const res = await getAllProducts();
+//     setProducts(res.data || []);
+//   };
+
+//   useEffect(() => {
+//     (async () => {
+//       setLoading(true);
+//       await fetchCategories();
+//       await fetchProducts();
+//       setLoading(false);
+//     })();
+//   }, []);
+
+//   // BUY NOW
+
+//   const handleBuyNow = (productId) => {
+//     router.push(`/dashboard/checkout?productId=${productId}&qty=1`);
+//   };
+
+//   // CREATE PRODUCT
+
+//   const handleCreateProduct = async () => {
+//     if (!form.categoryId) return alert("Category required");
+//     if (!form.artistName) return alert("Artist required");
+//     if (!form.name) return alert("Name required");
+//     if (!form.slug) return alert("Slug required");
+//     if (!form.description) return alert("Description required");
+//     if (!form.price) return alert("Price required");
+//     if (!form.stock) return alert("Stock required");
+
+//     if (imageFiles.length === 0) return alert("Please upload images");
+
+//     try {
+//       setLoading(true);
+
+//       const uploadedUrls = await uploadMultipleToAzure(imageFiles);
+
+//       await createProduct({
+//         ...form,
+//         price: Number(form.price),
+//         stock: Number(form.stock),
+
+//         donationPercentage:
+//           form.donationPercentage === ""
+//             ? null
+//             : Number(form.donationPercentage),
+
+//         images: uploadedUrls,
+//         thumbnail: uploadedUrls[0],
+//       });
+
+//       alert("Product created");
+
+//       setForm({
+//         categoryId: "",
+//         artistName: "",
+//         name: "",
+//         slug: "",
+//         description: "",
+//         size: "",
+//         weight: "",
+//         donationPercentage: "",
+//         deliveryInfo: "",
+//         address: "",
+//         installationInstructions: "",
+//         price: "",
+//         stock: 1,
+//         isActive: true,
+//       });
+
+//       setImageFiles([]);
+
+//       await fetchProducts();
+//     } catch (err) {
+//       alert(err.message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // START EDIT
+
+//   // const handleStartEdit = (p) => {
+//   //   setEditingId(p.id);
+//   //   setEditData({ ...p });
+//   //   setNewEditImages([]);
+//   // };
+
+//   const handleStartEdit = (p) => {
+//     setEditingId(p.id);
+
+//     setEditData({
+//       categoryId: p.categoryId,
+//       artistName: p.artistName,
+//       name: p.name,
+//       slug: p.slug,
+//       description: p.description,
+//       size: p.size,
+//       weight: p.weight,
+//       donationPercentage: p.donationPercentage,
+//       deliveryInfo: p.deliveryInfo,
+//       address: p.address,
+//       installationInstructions: p.installationInstructions,
+//       price: p.price,
+//       stock: p.stock,
+//       isActive: p.isActive,
+//     });
+
+//     setNewEditImages([]);
+//   };
+
+//   const handleCancelEdit = () => {
+//     setEditingId(null);
+//     setEditData(null);
+//   };
+
+//   // UPDATE PRODUCT
+
+//   const handleUpdateProduct = async () => {
+//     try {
+//       setLoading(true);
+
+//       let finalImages = selectedEditingProduct.images || [];
+
+//       if (newEditImages.length > 0) {
+//         const newUrls = await uploadMultipleToAzure(newEditImages);
+
+//         finalImages = [...finalImages, ...newUrls];
+//       }
+
+//       await updateProduct(editingId, {
+//         ...editData,
+
+//         price: Number(editData.price),
+//         stock: Number(editData.stock),
+
+//         donationPercentage:
+//           editData.donationPercentage === ""
+//             ? null
+//             : Number(editData.donationPercentage),
+
+//         images: finalImages,
+//         thumbnail: finalImages[0],
+//       });
+
+//       alert("Updated");
+
+//       handleCancelEdit();
+
+//       await fetchProducts();
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // DELETE IMAGE
+
+//   // const handleDeleteImage = async (productId, imgUrl) => {
+//   //   try {
+//   //     setLoading(true);
+
+//   //     await deleteFromAzure(imgUrl);
+
+//   //     const product = products.find((p) => p.id === productId);
+
+//   //     const updatedImages = product.images.filter((i) => i !== imgUrl);
+
+//   //     await updateProduct(productId, {
+//   //       images: updatedImages,
+//   //       thumbnail: updatedImages[0] || null,
+//   //     });
+
+//   //     await fetchProducts();
+//   //   } finally {
+//   //     setLoading(false);
+//   //   }
+//   // };
+//   const handleDeleteImage = async (productId, imgUrl) => {
+//     try {
+//       setLoading(true);
+
+//       await deleteFromAzure(imgUrl);
+
+//       const product = products.find((p) => p.id === productId);
+
+//       const updatedImages = product.images.filter((i) => i !== imgUrl);
+
+//       const updatedThumbnail =
+//         product.thumbnail === imgUrl
+//           ? updatedImages[0] || null
+//           : product.thumbnail;
+
+//       await updateProduct(productId, {
+//         images: updatedImages,
+//         thumbnail: updatedThumbnail,
+//       });
+
+//       // ✅ UPDATE UI IMMEDIATELY (IMPORTANT FIX)
+//       setProducts((prev) =>
+//         prev.map((p) =>
+//           p.id === productId
+//             ? {
+//                 ...p,
+//                 images: updatedImages,
+//                 thumbnail: updatedThumbnail,
+//               }
+//             : p
+//         )
+//       );
+//     } catch (err) {
+//       alert(err.message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // DELETE PRODUCT
+
+//   const handleDeleteProduct = async (product) => {
+//     if (!confirm("Delete product?")) return;
+
+//     try {
+//       setLoading(true);
+
+//       for (const img of product.images || []) await deleteFromAzure(img);
+
+//       await deleteProduct(product.id);
+
+//       await fetchProducts();
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // UI
+
+//   return (
+//     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+//       {/* HEADER */}
+
+//       <div className="flex justify-between items-center">
+//         <div>
+//           <h1 className="text-2xl font-semibold">Products</h1>
+
+//           <p className="text-gray-500 text-sm">Manage artwork catalog</p>
+//         </div>
+
+//         {loading && (
+//           <div className="text-sm bg-yellow-100 text-yellow-700 px-3 py-1 rounded">
+//             Processing...
+//           </div>
+//         )}
+//       </div>
+
+//       <CreateProductForm
+//         form={form}
+//         categories={categories}
+//         imageFiles={imageFiles}
+//         handleCreateProduct={handleCreateProduct}
+//         setForm={setForm}
+//         setImageFiles={setImageFiles}
+//       />
+
+//       {/* PRODUCTS GRID */}
+
+//       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+//         {products
+//           .filter((p) => Number(p.stock) > 0)
+//           .map((p) => {
+//             const editing = editingId === p.id;
+
+//             return (
+//               <div key={p.id}>
+//                 <ProductCard
+//                   p={p}
+//                   editing={editingId === p.id}
+//                   editData={editData}
+//                   setEditData={setEditData}
+//                   newEditImages={newEditImages}
+//                   setNewEditImages={setNewEditImages}
+//                   handleDeleteImage={handleDeleteImage}
+//                   handleUpdateProduct={handleUpdateProduct}
+//                   handleCancelEdit={handleCancelEdit}
+//                   handleBuyNow={handleBuyNow}
+//                   handleStartEdit={handleStartEdit}
+//                   handleDeleteProduct={handleDeleteProduct}
+//                 />
+//               </div>
+//             );
+//           })}
+//       </div>
+//     </div>
+//   );
+// }
 
 // "use client";
 

@@ -8,16 +8,19 @@
 //   const [products, setProducts] = useState([]);
 //   const [loading, setLoading] = useState(false);
 
-//   // ✅ form
+//   // Product form
 //   const [productId, setProductId] = useState("");
 //   const [quantity, setQuantity] = useState(1);
 
-//   const [paymentStatus, setPaymentStatus] = useState("PAID"); // PAID / PENDING
-//   const [paymentMethod, setPaymentMethod] = useState("CASH"); // CASH/UPI/CARD/OTHER
-//   const [paymentRef, setPaymentRef] = useState("");
-
-//   const [customerName, setCustomerName] = useState("Walk-in Customer");
+//   // Customer (MANDATORY)
+//   const [customerName, setCustomerName] = useState("");
+//   const [customerEmail, setCustomerEmail] = useState("");
 //   const [customerPhone, setCustomerPhone] = useState("");
+
+//   // Payment
+//   const [paymentStatus, setPaymentStatus] = useState("PAID");
+//   const [paymentMethod, setPaymentMethod] = useState("CASH");
+//   const [paymentRef, setPaymentRef] = useState("");
 
 //   const selectedProduct = useMemo(() => {
 //     return products.find((p) => p.id === productId) || null;
@@ -25,8 +28,7 @@
 
 //   const amount = useMemo(() => {
 //     if (!selectedProduct) return 0;
-//     const price = Number(selectedProduct.price || 0);
-//     return price * Number(quantity || 0);
+//     return Number(selectedProduct.price || 0) * Number(quantity || 0);
 //   }, [selectedProduct, quantity]);
 
 //   const fetchProducts = async () => {
@@ -47,10 +49,23 @@
 //     })();
 //   }, []);
 
+//   const isValidEmail = (email) => {
+//     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+//   };
+
 //   const handleCreateOrder = async () => {
 //     if (!productId) return alert("Please select a product");
+
 //     if (!quantity || isNaN(quantity) || Number(quantity) < 1)
 //       return alert("Quantity must be >= 1");
+
+//     if (!customerName.trim()) return alert("Customer name is required");
+
+//     if (!customerEmail.trim()) return alert("Customer email is required");
+
+//     if (!isValidEmail(customerEmail)) return alert("Enter valid email address");
+
+//     if (!customerPhone.trim()) return alert("Customer phone is required");
 
 //     try {
 //       setLoading(true);
@@ -59,149 +74,338 @@
 //         productId,
 //         quantity: Number(quantity),
 
-//         paymentStatus, // PAID or PENDING
+//         paymentStatus,
+
 //         paymentMethod: paymentStatus === "PAID" ? paymentMethod : null,
+
 //         paymentRef: paymentStatus === "PAID" ? paymentRef : null,
 
 //         customerName,
-//         customerPhone: customerPhone || null,
+//         customerEmail,
+//         customerPhone,
 //       });
 
 //       alert("Order created ✅");
 
-//       // ✅ reset
+//       // Reset form
 //       setProductId("");
 //       setQuantity(1);
+//       setCustomerName("");
+//       setCustomerEmail("");
+//       setCustomerPhone("");
 //       setPaymentStatus("PAID");
 //       setPaymentMethod("CASH");
 //       setPaymentRef("");
-//       setCustomerName("Walk-in Customer");
-//       setCustomerPhone("");
 //     } catch (err) {
 //       alert(err.message);
 //     } finally {
 //       setLoading(false);
 //     }
 //   };
-
 //   return (
-//     <div className="space-y-6">
+//     <div className="space-y-6 max-w-5xl">
 //       {/* Header */}
-//       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-//         <div>
-//           <h2 className="text-2xl font-bold">New Order (POS)</h2>
-//           <p className="text-gray-600 text-sm">
-//             Create store orders (paid or pending) ✅
-//           </p>
-//         </div>
+//       <div>
+//         <h2 className="text-3xl font-semibold text-gray-900">New POS Order</h2>
+
+//         <p className="text-gray-500 text-sm mt-1">
+//           Create in-store order with customer and payment details
+//         </p>
 //       </div>
 
-//       {/* Form */}
-//       <div className="bg-white border shadow rounded-2xl p-5 space-y-4">
-//         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//           {/* Product dropdown */}
-//           <select
-//             className="border rounded-xl px-3 py-2"
-//             value={productId}
-//             onChange={(e) => setProductId(e.target.value)}
-//           >
-//             <option value="">Select Product</option>
-//             {products.map((p) => (
-//               <option key={p.id} value={p.id}>
-//                 {p.name} (Stock: {p.stock})
-//               </option>
-//             ))}
-//           </select>
+//       {/* Main Card */}
+//       <div
+//         className="
+//         bg-white
+//         border border-gray-200
+//         shadow-sm
+//         rounded-2xl
+//         p-6
+//         space-y-6
+//       "
+//       >
+//         {/* Product + Preview */}
+//         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+//           {/* Product Selector */}
+//           <div className="space-y-2">
+//             <label className="text-sm font-medium text-gray-700">
+//               Select Product
+//             </label>
 
-//           {/* Quantity */}
-//           <input
-//             type="number"
-//             min={1}
-//             className="border rounded-xl px-3 py-2"
-//             placeholder="Quantity"
-//             value={quantity}
-//             onChange={(e) => setQuantity(e.target.value)}
-//           />
+//             <select
+//               className="
+//                 w-full
+//                 border border-gray-300
+//                 rounded-xl
+//                 px-4 py-3
+//                 focus:ring-2 focus:ring-black focus:border-black
+//                 outline-none
+//                 transition
+//               "
+//               value={productId}
+//               onChange={(e) => setProductId(e.target.value)}
+//             >
+//               <option value="">Choose product</option>
 
-//           {/* Customer */}
-//           <input
-//             className="border rounded-xl px-3 py-2"
-//             placeholder="Customer Name"
-//             value={customerName}
-//             onChange={(e) => setCustomerName(e.target.value)}
-//           />
+//               {products.map((p) => (
+//                 <option key={p.id} value={p.id}>
+//                   {p.name} • ₹{p.price} • Stock: {p.stock}
+//                 </option>
+//               ))}
+//             </select>
+//           </div>
 
-//           <input
-//             className="border rounded-xl px-3 py-2"
-//             placeholder="Customer Phone (optional)"
-//             value={customerPhone}
-//             onChange={(e) => setCustomerPhone(e.target.value)}
-//           />
+//           {/* Product Preview */}
+//           {selectedProduct && (
+//             <div
+//               className="
+//               flex gap-4
+//               border border-gray-200
+//               rounded-xl
+//               p-4
+//               bg-gray-50
+//             "
+//             >
+//               {/* Image */}
+//               <img
+//                 src={selectedProduct.thumbnail}
+//                 className="w-24 h-24 object-cover rounded-lg border"
+//               />
 
-//           {/* Payment Status */}
-//           <select
-//             className="border rounded-xl px-3 py-2"
-//             value={paymentStatus}
-//             onChange={(e) => setPaymentStatus(e.target.value)}
-//           >
-//             <option value="PAID">PAID (Customer paid now)</option>
-//             <option value="PENDING">PENDING (Pay later)</option>
-//           </select>
+//               {/* Info */}
+//               <div className="flex flex-col justify-between">
+//                 <div>
+//                   <p className="font-semibold text-gray-900">
+//                     {selectedProduct.name}
+//                   </p>
 
-//           {/* Payment Method */}
-//           <select
-//             className="border rounded-xl px-3 py-2"
-//             value={paymentMethod}
-//             onChange={(e) => setPaymentMethod(e.target.value)}
-//             disabled={paymentStatus !== "PAID"}
-//           >
-//             <option value="CASH">CASH</option>
-//             <option value="UPI">UPI</option>
-//             <option value="CARD">CARD</option>
-//             <option value="OTHER">OTHER</option>
-//           </select>
+//                   <p className="text-sm text-gray-500">
+//                     Artist: {selectedProduct.artistName}
+//                   </p>
 
-//           {/* Payment Ref */}
-//           <input
-//             className="border rounded-xl px-3 py-2 md:col-span-2"
-//             placeholder="Payment Reference (optional)"
-//             value={paymentRef}
-//             onChange={(e) => setPaymentRef(e.target.value)}
-//             disabled={paymentStatus !== "PAID"}
-//           />
+//                   <p className="text-xs text-gray-400">
+//                     Category: {selectedProduct.Category?.name}
+//                   </p>
+
+//                   {selectedProduct.donationPercentage > 0 && (
+//                     <p className="text-xs text-green-600 font-medium">
+//                       {selectedProduct.donationPercentage}% donated
+//                     </p>
+//                   )}
+//                 </div>
+
+//                 {/* Stock badge */}
+//                 <div>
+//                   {selectedProduct.stock > 0 ? (
+//                     <span
+//                       className="
+//                       text-xs
+//                       bg-green-100
+//                       text-green-700
+//                       px-2 py-1
+//                       rounded-full
+//                     "
+//                     >
+//                       In Stock
+//                     </span>
+//                   ) : (
+//                     <span
+//                       className="
+//                       text-xs
+//                       bg-red-100
+//                       text-red-700
+//                       px-2 py-1
+//                       rounded-full
+//                     "
+//                     >
+//                       Out of Stock
+//                     </span>
+//                   )}
+//                 </div>
+//               </div>
+//             </div>
+//           )}
 //         </div>
 
-//         {/* Summary */}
-//         <div className="bg-gray-50 border rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-//           <div className="flex items-center gap-3">
-//             <div className="w-14 h-14 rounded-xl border overflow-hidden bg-white">
-//               {selectedProduct?.thumbnail ? (
-//                 <img
-//                   src={selectedProduct.thumbnail}
-//                   alt={selectedProduct.name}
-//                   className="w-full h-full object-cover"
-//                 />
-//               ) : (
-//                 <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
-//                   No Img
-//                 </div>
-//               )}
-//             </div>
+//         {/* Form Fields */}
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//           {/* Quantity */}
+//           <div className="space-y-1">
+//             <label className="text-sm font-medium text-gray-700">
+//               Quantity
+//               <span className="text-red-500 ml-1">*</span>
+//             </label>
 
-//             <div>
-//               <p className="font-semibold">
-//                 {selectedProduct?.name || "Select a product"}
-//               </p>
-//               <p className="text-xs text-gray-600">
-//                 Price: AED {selectedProduct?.price || 0} • Stock:{" "}
-//                 {selectedProduct?.stock ?? 0}
-//               </p>
-//             </div>
+//             <input
+//               type="number"
+//               min={1}
+//               className="
+//                 w-full
+//                 border border-gray-300
+//                 rounded-xl
+//                 px-4 py-3
+//                 focus:ring-2 focus:ring-black focus:border-black
+//                 outline-none
+//               "
+//               value={quantity}
+//               onChange={(e) => setQuantity(e.target.value)}
+//             />
+//           </div>
+
+//           {/* Customer Name */}
+//           <div className="space-y-1">
+//             <label className="text-sm font-medium text-gray-700">
+//               Customer Name
+//               <span className="text-red-500 ml-1">*</span>
+//             </label>
+
+//             <input
+//               className="
+//                 w-full
+//                 border border-gray-300
+//                 rounded-xl
+//                 px-4 py-3
+//                 focus:ring-2 focus:ring-black focus:border-black
+//               "
+//               value={customerName}
+//               onChange={(e) => setCustomerName(e.target.value)}
+//             />
+//           </div>
+
+//           {/* Email */}
+//           <div className="space-y-1">
+//             <label className="text-sm font-medium text-gray-700">
+//               Customer Email
+//               <span className="text-red-500 ml-1">*</span>
+//             </label>
+
+//             <input
+//               type="email"
+//               className="
+//                 w-full
+//                 border border-gray-300
+//                 rounded-xl
+//                 px-4 py-3
+//                 focus:ring-2 focus:ring-black focus:border-black
+//               "
+//               value={customerEmail}
+//               onChange={(e) => setCustomerEmail(e.target.value)}
+//             />
+//           </div>
+
+//           {/* Phone */}
+//           <div className="space-y-1">
+//             <label className="text-sm font-medium text-gray-700">
+//               Customer Phone
+//               <span className="text-red-500 ml-1">*</span>
+//             </label>
+
+//             <input
+//               className="
+//                 w-full
+//                 border border-gray-300
+//                 rounded-xl
+//                 px-4 py-3
+//                 focus:ring-2 focus:ring-black focus:border-black
+//               "
+//               value={customerPhone}
+//               onChange={(e) => setCustomerPhone(e.target.value)}
+//             />
+//           </div>
+
+//           {/* Payment Status */}
+//           <div className="space-y-1">
+//             <label className="text-sm font-medium text-gray-700">
+//               Payment Status
+//               <span className="text-red-500 ml-1">*</span>
+//             </label>
+
+//             <select
+//               className="
+//                 w-full
+//                 border border-gray-300
+//                 rounded-xl
+//                 px-4 py-3
+//               "
+//               value={paymentStatus}
+//               onChange={(e) => setPaymentStatus(e.target.value)}
+//             >
+//               <option value="PAID">Paid</option>
+//               <option value="PENDING">Pending</option>
+//             </select>
+//           </div>
+
+//           {/* Payment Method */}
+//           <div className="space-y-1">
+//             <label className="text-sm font-medium text-gray-700">
+//               Payment Method
+//               <span className="text-red-500 ml-1">*</span>
+//             </label>
+
+//             <select
+//               disabled={paymentStatus !== "PAID"}
+//               className="
+//                 w-full
+//                 border border-gray-300
+//                 rounded-xl
+//                 px-4 py-3
+//                 disabled:bg-gray-100
+//               "
+//               value={paymentMethod}
+//               onChange={(e) => setPaymentMethod(e.target.value)}
+//             >
+//               <option>CASH</option>
+//               <option>UPI</option>
+//               <option>CARD</option>
+//               <option>OTHER</option>
+//             </select>
+//           </div>
+
+//           {/* Payment Ref */}
+//           <div className="space-y-1 md:col-span-2">
+//             <label className="text-sm font-medium text-gray-700">
+//               Payment Reference
+//             </label>
+
+//             <input
+//               disabled={paymentStatus !== "PAID"}
+//               className="
+//                 w-full
+//                 border border-gray-300
+//                 rounded-xl
+//                 px-4 py-3
+//                 disabled:bg-gray-100
+//               "
+//               value={paymentRef}
+//               onChange={(e) => setPaymentRef(e.target.value)}
+//             />
+//           </div>
+//         </div>
+
+//         {/* Order Summary */}
+//         <div
+//           className="
+//           border border-gray-200
+//           rounded-xl
+//           p-5
+//           bg-gradient-to-r from-gray-50 to-white
+//           flex justify-between items-center
+//         "
+//         >
+//           <div>
+//             <p className="font-semibold text-gray-900">
+//               {selectedProduct?.name || "No product selected"}
+//             </p>
+
+//             <p className="text-sm text-gray-500">
+//               ₹{selectedProduct?.price || 0} × {quantity}
+//             </p>
 //           </div>
 
 //           <div className="text-right">
-//             <p className="text-sm text-gray-600">Total Amount</p>
-//             <p className="text-2xl font-bold">AED {amount}</p>
+//             <p className="text-xs text-gray-500">Total</p>
+
+//             <p className="text-2xl font-bold text-gray-900">₹{amount}</p>
 //           </div>
 //         </div>
 
@@ -209,7 +413,322 @@
 //         <button
 //           onClick={handleCreateOrder}
 //           disabled={loading}
-//           className="w-full sm:w-fit px-5 py-2 rounded-xl bg-black text-white disabled:opacity-50"
+//           className="
+//             w-full
+//             bg-black
+//             hover:bg-gray-900
+//             text-white
+//             py-3
+//             rounded-xl
+//             font-medium
+//             transition
+//             shadow
+//           "
+//         >
+//           {loading ? "Creating Order..." : "Create Order"}
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+// "use client";
+
+// import { useEffect, useMemo, useState } from "react";
+// import { getAllProducts } from "@/lib/product.api";
+// import { createOrder } from "@/lib/order.api";
+
+// export default function NewOrderPage() {
+//   const [products, setProducts] = useState([]);
+//   const [loading, setLoading] = useState(false);
+
+//   /*
+//   ========================================
+//   PRODUCT
+//   ========================================
+//   */
+
+//   const [productId, setProductId] = useState("");
+//   const [quantity, setQuantity] = useState(1);
+
+//   /*
+//   ========================================
+//   CUSTOMER (NEW STRUCTURE)
+//   ========================================
+//   */
+
+//   const [customerFirstName, setCustomerFirstName] = useState("");
+//   const [customerLastName, setCustomerLastName] = useState("");
+//   const [customerEmail, setCustomerEmail] = useState("");
+
+//   const [customerCountryCode, setCustomerCountryCode] = useState("+91");
+//   const [customerPhoneNumber, setCustomerPhoneNumber] = useState("");
+
+//   const [customerCountry, setCustomerCountry] = useState("");
+//   const [customerState, setCustomerState] = useState("");
+//   const [customerCity, setCustomerCity] = useState("");
+//   const [customerAddress, setCustomerAddress] = useState("");
+
+//   /*
+//   ========================================
+//   PAYMENT
+//   ========================================
+//   */
+
+//   const [paymentStatus, setPaymentStatus] = useState("PAID");
+//   const [paymentMethod, setPaymentMethod] = useState("CASH");
+//   const [paymentRef, setPaymentRef] = useState("");
+
+//   /*
+//   ========================================
+//   COMPUTED
+//   ========================================
+//   */
+
+//   const selectedProduct = useMemo(() => {
+//     return products.find((p) => p.id === productId) || null;
+//   }, [productId, products]);
+
+//   const amount = useMemo(() => {
+//     if (!selectedProduct) return 0;
+//     return Number(selectedProduct.price) * Number(quantity);
+//   }, [selectedProduct, quantity]);
+
+//   /*
+//   ========================================
+//   FETCH PRODUCTS
+//   ========================================
+//   */
+
+//   useEffect(() => {
+//     (async () => {
+//       try {
+//         setLoading(true);
+//         const res = await getAllProducts();
+//         setProducts(res.data || []);
+//       } catch (err) {
+//         alert(err.message);
+//       } finally {
+//         setLoading(false);
+//       }
+//     })();
+//   }, []);
+
+//   /*
+//   ========================================
+//   VALIDATORS
+//   ========================================
+//   */
+
+//   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+//   /*
+//   ========================================
+//   CREATE ORDER
+//   ========================================
+//   */
+
+//   const handleCreateOrder = async () => {
+//     if (!productId) return alert("Select product");
+
+//     if (quantity < 1) return alert("Invalid quantity");
+
+//     if (!customerFirstName) return alert("First name required");
+
+//     if (!customerLastName) return alert("Last name required");
+
+//     if (!isValidEmail(customerEmail)) return alert("Valid email required");
+
+//     if (!customerPhoneNumber) return alert("Phone number required");
+
+//     if (!customerCountry) return alert("Country required");
+
+//     if (!customerState) return alert("State required");
+
+//     if (!customerCity) return alert("City required");
+
+//     if (!customerAddress) return alert("Address required");
+
+//     try {
+//       setLoading(true);
+
+//       await createOrder({
+//         productId,
+//         quantity: Number(quantity),
+
+//         paymentStatus,
+
+//         paymentMethod: paymentStatus === "PAID" ? paymentMethod : null,
+
+//         paymentRef: paymentStatus === "PAID" ? paymentRef : null,
+
+//         customerFirstName,
+//         customerLastName,
+//         customerEmail,
+
+//         customerCountryCode,
+//         customerPhoneNumber,
+
+//         customerCountry,
+//         customerState,
+//         customerCity,
+//         customerAddress,
+//       });
+
+//       alert("Order created successfully ✅");
+
+//       /*
+//       RESET
+//       */
+
+//       setProductId("");
+//       setQuantity(1);
+
+//       setCustomerFirstName("");
+//       setCustomerLastName("");
+//       setCustomerEmail("");
+
+//       setCustomerPhoneNumber("");
+
+//       setCustomerCountry("");
+//       setCustomerState("");
+//       setCustomerCity("");
+//       setCustomerAddress("");
+
+//       setPaymentStatus("PAID");
+//       setPaymentMethod("CASH");
+//       setPaymentRef("");
+//     } catch (err) {
+//       alert(err.message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   /*
+//   ========================================
+//   UI
+//   ========================================
+//   */
+
+//   return (
+//     <div className="max-w-5xl space-y-6">
+//       <h2 className="text-3xl font-semibold">New POS Order</h2>
+
+//       <div className="bg-white border rounded-2xl p-6 space-y-6">
+//         {/* PRODUCT */}
+//         <select
+//           value={productId}
+//           onChange={(e) => setProductId(e.target.value)}
+//           className="w-full border rounded-xl px-4 py-3"
+//         >
+//           <option value="">Select product</option>
+
+//           {products.map((p) => (
+//             <option key={p.id} value={p.id}>
+//               {p.name} • ₹{p.price}
+//             </option>
+//           ))}
+//         </select>
+
+//         {/* QUANTITY */}
+//         <input
+//           type="number"
+//           min={1}
+//           value={quantity}
+//           onChange={(e) => setQuantity(Number(e.target.value))}
+//           className="w-full border rounded-xl px-4 py-3"
+//         />
+
+//         {/* NAME */}
+//         <div className="grid grid-cols-2 gap-4">
+//           <input
+//             placeholder="First name"
+//             value={customerFirstName}
+//             onChange={(e) => setCustomerFirstName(e.target.value)}
+//             className="border rounded-xl px-4 py-3"
+//           />
+
+//           <input
+//             placeholder="Last name"
+//             value={customerLastName}
+//             onChange={(e) => setCustomerLastName(e.target.value)}
+//             className="border rounded-xl px-4 py-3"
+//           />
+//         </div>
+
+//         {/* EMAIL */}
+//         <input
+//           placeholder="Email"
+//           value={customerEmail}
+//           onChange={(e) => setCustomerEmail(e.target.value)}
+//           className="w-full border rounded-xl px-4 py-3"
+//         />
+
+//         {/* PHONE */}
+//         <div className="flex gap-2">
+//           <input
+//             value={customerCountryCode}
+//             onChange={(e) => setCustomerCountryCode(e.target.value)}
+//             className="w-24 border rounded-xl px-4 py-3"
+//           />
+
+//           <input
+//             placeholder="Phone"
+//             value={customerPhoneNumber}
+//             onChange={(e) => setCustomerPhoneNumber(e.target.value)}
+//             className="flex-1 border rounded-xl px-4 py-3"
+//           />
+//         </div>
+
+//         {/* ADDRESS */}
+//         <input
+//           placeholder="Country"
+//           value={customerCountry}
+//           onChange={(e) => setCustomerCountry(e.target.value)}
+//           className="border rounded-xl px-4 py-3"
+//         />
+
+//         <input
+//           placeholder="State"
+//           value={customerState}
+//           onChange={(e) => setCustomerState(e.target.value)}
+//           className="border rounded-xl px-4 py-3"
+//         />
+
+//         <input
+//           placeholder="City"
+//           value={customerCity}
+//           onChange={(e) => setCustomerCity(e.target.value)}
+//           className="border rounded-xl px-4 py-3"
+//         />
+
+//         <textarea
+//           placeholder="Address"
+//           value={customerAddress}
+//           onChange={(e) => setCustomerAddress(e.target.value)}
+//           className="border rounded-xl px-4 py-3"
+//         />
+
+//         {/* PAYMENT */}
+//         <select
+//           value={paymentStatus}
+//           onChange={(e) => setPaymentStatus(e.target.value)}
+//           className="border rounded-xl px-4 py-3"
+//         >
+//           <option value="PAID">Paid</option>
+
+//           <option value="PENDING">Pending</option>
+//         </select>
+
+//         {/* TOTAL */}
+//         <div className="text-xl font-bold">Total: ₹{amount}</div>
+
+//         {/* SUBMIT */}
+//         <button
+//           onClick={handleCreateOrder}
+//           disabled={loading}
+//           className="w-full bg-black text-white py-3 rounded-xl"
 //         >
 //           {loading ? "Creating..." : "Create Order"}
 //         </button>
@@ -224,23 +743,79 @@ import { useEffect, useMemo, useState } from "react";
 import { getAllProducts } from "@/lib/product.api";
 import { createOrder } from "@/lib/order.api";
 
+function InputField({ label, value, setValue, select, options }) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-gray-700">{label}</label>
+
+      {select ? (
+        <select
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-black focus:outline-none"
+        >
+          {options.map((o) => (
+            <option key={o}>{o}</option>
+          ))}
+        </select>
+      ) : (
+        <input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-black focus:outline-none"
+        />
+      )}
+    </div>
+  );
+}
+
+function SummaryRow({ label, value }) {
+  return (
+    <div className="flex justify-between text-gray-600">
+      <span>{label}</span>
+      <span className="font-medium text-gray-900">{value}</span>
+    </div>
+  );
+}
+
 export default function NewOrderPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Product form
+  /*
+  PRODUCT
+  */
+
   const [productId, setProductId] = useState("");
   const [quantity, setQuantity] = useState(1);
 
-  // Customer (MANDATORY)
-  const [customerName, setCustomerName] = useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
+  /*
+  CUSTOMER
+  */
 
-  // Payment
-  const [paymentStatus, setPaymentStatus] = useState("PAID");
+  const [customerFirstName, setCustomerFirstName] = useState("");
+  const [customerLastName, setCustomerLastName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+
+  const [customerCountryCode, setCustomerCountryCode] = useState("+91");
+  const [customerPhoneNumber, setCustomerPhoneNumber] = useState("");
+
+  const [customerCountry, setCustomerCountry] = useState("");
+  const [customerState, setCustomerState] = useState("");
+  const [customerCity, setCustomerCity] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
+
+  /*
+  PAYMENT
+  */
+
+  const [paymentStatus, setPaymentStatus] = useState("PENDING");
   const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [paymentRef, setPaymentRef] = useState("");
+
+  /*
+  COMPUTED
+  */
 
   const selectedProduct = useMemo(() => {
     return products.find((p) => p.id === productId) || null;
@@ -248,541 +823,544 @@ export default function NewOrderPage() {
 
   const amount = useMemo(() => {
     if (!selectedProduct) return 0;
-    return Number(selectedProduct.price || 0) * Number(quantity || 0);
+    return Number(selectedProduct.price) * Number(quantity);
   }, [selectedProduct, quantity]);
 
-  const fetchProducts = async () => {
-    const res = await getAllProducts();
-    setProducts(res.data || []);
-  };
+  /*
+  FETCH
+  */
 
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
-        await fetchProducts();
-      } catch (err) {
-        alert(err.message);
+        const res = await getAllProducts();
+        setProducts(res.data || []);
       } finally {
         setLoading(false);
       }
     })();
   }, []);
 
-  const isValidEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  /*
+  VALIDATION
+  */
+
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  /*
+  CREATE ORDER
+  */
 
   const handleCreateOrder = async () => {
-    if (!productId) return alert("Please select a product");
-
-    if (!quantity || isNaN(quantity) || Number(quantity) < 1)
-      return alert("Quantity must be >= 1");
-
-    if (!customerName.trim()) return alert("Customer name is required");
-
-    if (!customerEmail.trim()) return alert("Customer email is required");
-
-    if (!isValidEmail(customerEmail)) return alert("Enter valid email address");
-
-    if (!customerPhone.trim()) return alert("Customer phone is required");
+    if (!productId) return alert("Select product");
+    if (!customerFirstName) return alert("First name required");
+    if (!customerLastName) return alert("Last name required");
+    if (!isValidEmail(customerEmail)) return alert("Valid email required");
+    if (!customerPhoneNumber) return alert("Phone required");
+    if (!customerCountry) return alert("Country required");
+    if (!customerState) return alert("State required");
+    if (!customerCity) return alert("City required");
+    if (!customerAddress) return alert("Address required");
 
     try {
       setLoading(true);
 
       await createOrder({
         productId,
-        quantity: Number(quantity),
+        quantity,
 
         paymentStatus,
-
         paymentMethod: paymentStatus === "PAID" ? paymentMethod : null,
+        paymentRef,
 
-        paymentRef: paymentStatus === "PAID" ? paymentRef : null,
-
-        customerName,
+        customerFirstName,
+        customerLastName,
         customerEmail,
-        customerPhone,
+
+        customerCountryCode,
+        customerPhoneNumber,
+
+        customerCountry,
+        customerState,
+        customerCity,
+        customerAddress,
       });
 
       alert("Order created ✅");
-
-      // Reset form
-      setProductId("");
-      setQuantity(1);
-      setCustomerName("");
-      setCustomerEmail("");
-      setCustomerPhone("");
-      setPaymentStatus("PAID");
-      setPaymentMethod("CASH");
-      setPaymentRef("");
     } catch (err) {
       alert(err.message);
     } finally {
       setLoading(false);
     }
   };
+
+  /*
+  UI
+  */
   return (
-    <div className="space-y-6 max-w-5xl">
-      {/* Header */}
-      <div>
-        <h2 className="text-3xl font-semibold text-gray-900">New POS Order</h2>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        {/* HEADER */}
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold text-gray-900">Create New Order</h1>
 
-        <p className="text-gray-500 text-sm mt-1">
-          Create in-store order with customer and payment details
-        </p>
-      </div>
+          <p className="text-gray-500">
+            Create a new POS order with product, customer, and payment details.
+          </p>
+        </div>
 
-      {/* Main Card */}
-      <div
-        className="
-        bg-white
-        border border-gray-200
-        shadow-sm
-        rounded-2xl
-        p-6
-        space-y-6
-      "
-      >
-        {/* Product + Preview */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Product Selector */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Select Product
-            </label>
+        {/* GRID */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          {/* LEFT */}
+          <div className="xl:col-span-2 space-y-6">
+            {/* PRODUCT */}
+            <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-5">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Product Information
+              </h2>
 
-            <select
-              className="
-                w-full
-                border border-gray-300
-                rounded-xl
-                px-4 py-3
-                focus:ring-2 focus:ring-black focus:border-black
-                outline-none
-                transition
-              "
-              value={productId}
-              onChange={(e) => setProductId(e.target.value)}
-            >
-              <option value="">Choose product</option>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Select Product
+                </label>
 
-              {products.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} • ₹{p.price} • Stock: {p.stock}
-                </option>
-              ))}
-            </select>
-          </div>
+                <select
+                  value={productId}
+                  onChange={(e) => setProductId(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-black focus:outline-none"
+                >
+                  <option value="">Select product</option>
 
-          {/* Product Preview */}
-          {selectedProduct && (
-            <div
-              className="
-              flex gap-4
-              border border-gray-200
-              rounded-xl
-              p-4
-              bg-gray-50
-            "
-            >
-              {/* Image */}
-              <img
-                src={selectedProduct.thumbnail}
-                className="w-24 h-24 object-cover rounded-lg border"
-              />
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} — ₹{p.price}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              {/* Info */}
-              <div className="flex flex-col justify-between">
-                <div>
-                  <p className="font-semibold text-gray-900">
-                    {selectedProduct.name}
-                  </p>
+              {selectedProduct && (
+                <div className="flex gap-4 border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <img
+                    src={selectedProduct.thumbnail}
+                    className="w-20 h-20 rounded-lg object-cover border"
+                  />
 
-                  <p className="text-sm text-gray-500">
-                    Artist: {selectedProduct.artistName}
-                  </p>
-
-                  <p className="text-xs text-gray-400">
-                    Category: {selectedProduct.Category?.name}
-                  </p>
-
-                  {selectedProduct.donationPercentage > 0 && (
-                    <p className="text-xs text-green-600 font-medium">
-                      {selectedProduct.donationPercentage}% donated
+                  <div className="space-y-1">
+                    <p className="font-semibold text-gray-900">
+                      {selectedProduct.name}
                     </p>
-                  )}
+
+                    <p className="text-gray-600 text-sm">
+                      Price: ₹{selectedProduct.price}
+                    </p>
+
+                    <p className="text-xs text-gray-500">
+                      Stock: {selectedProduct.stock}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Quantity
+                </label>
+
+                <input
+                  type="number"
+                  min={1}
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-black focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* CUSTOMER */}
+            <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-5">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Customer Information
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    First Name
+                  </label>
+
+                  <input
+                    value={customerFirstName}
+                    onChange={(e) => setCustomerFirstName(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-black focus:outline-none"
+                  />
                 </div>
 
-                {/* Stock badge */}
-                <div>
-                  {selectedProduct.stock > 0 ? (
-                    <span
-                      className="
-                      text-xs
-                      bg-green-100
-                      text-green-700
-                      px-2 py-1
-                      rounded-full
-                    "
-                    >
-                      In Stock
-                    </span>
-                  ) : (
-                    <span
-                      className="
-                      text-xs
-                      bg-red-100
-                      text-red-700
-                      px-2 py-1
-                      rounded-full
-                    "
-                    >
-                      Out of Stock
-                    </span>
-                  )}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Last Name
+                  </label>
+
+                  <input
+                    value={customerLastName}
+                    onChange={(e) => setCustomerLastName(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-black focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Email
+                </label>
+
+                <input
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-black focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Phone Number
+                </label>
+
+                <div className="flex gap-2">
+                  <input
+                    value={customerCountryCode}
+                    onChange={(e) => setCustomerCountryCode(e.target.value)}
+                    className="w-24 border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-black focus:outline-none"
+                  />
+
+                  <input
+                    value={customerPhoneNumber}
+                    onChange={(e) => setCustomerPhoneNumber(e.target.value)}
+                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-black focus:outline-none"
+                  />
                 </div>
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Form Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Quantity */}
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">
-              Quantity
-              <span className="text-red-500 ml-1">*</span>
-            </label>
+            {/* ADDRESS */}
+            <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-5">
+              <h2 className="text-lg font-semibold text-gray-900">Address</h2>
 
-            <input
-              type="number"
-              min={1}
-              className="
-                w-full
-                border border-gray-300
-                rounded-xl
-                px-4 py-3
-                focus:ring-2 focus:ring-black focus:border-black
-                outline-none
-              "
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-            />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InputField
+                  label="Country"
+                  value={customerCountry}
+                  setValue={setCustomerCountry}
+                />
+
+                <InputField
+                  label="State"
+                  value={customerState}
+                  setValue={setCustomerState}
+                />
+
+                <InputField
+                  label="City"
+                  value={customerCity}
+                  setValue={setCustomerCity}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Full Address
+                </label>
+
+                <textarea
+                  value={customerAddress}
+                  onChange={(e) => setCustomerAddress(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-black focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* PAYMENT */}
+            <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-5">
+              <h2 className="text-lg font-semibold text-gray-900">Payment</h2>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Payment Status
+                </label>
+
+                <select
+                  value={paymentStatus}
+                  onChange={(e) => setPaymentStatus(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-black focus:outline-none"
+                >
+                  <option value="PAID">Paid</option>
+                  <option value="PENDING">Pending</option>
+                </select>
+              </div>
+
+              {paymentStatus === "PAID" && (
+                <>
+                  <InputField
+                    label="Payment Method"
+                    value={paymentMethod}
+                    setValue={setPaymentMethod}
+                    select
+                    options={["CASH", "UPI", "CARD", "OTHER"]}
+                  />
+
+                  <InputField
+                    label="Payment Reference"
+                    value={paymentRef}
+                    setValue={setPaymentRef}
+                  />
+                </>
+              )}
+            </div>
           </div>
 
-          {/* Customer Name */}
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">
-              Customer Name
-              <span className="text-red-500 ml-1">*</span>
-            </label>
+          {/* SUMMARY */}
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-5 h-fit sticky top-6">
+            <h2 className="text-lg font-semibold text-gray-900">
+              Order Summary
+            </h2>
 
-            <input
-              className="
-                w-full
-                border border-gray-300
-                rounded-xl
-                px-4 py-3
-                focus:ring-2 focus:ring-black focus:border-black
-              "
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-            />
-          </div>
+            <SummaryRow label="Product" value={selectedProduct?.name || "-"} />
 
-          {/* Email */}
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">
-              Customer Email
-              <span className="text-red-500 ml-1">*</span>
-            </label>
+            <SummaryRow label="Quantity" value={quantity} />
 
-            <input
-              type="email"
-              className="
-                w-full
-                border border-gray-300
-                rounded-xl
-                px-4 py-3
-                focus:ring-2 focus:ring-black focus:border-black
-              "
-              value={customerEmail}
-              onChange={(e) => setCustomerEmail(e.target.value)}
-            />
-          </div>
+            <div className="border-t pt-4 flex justify-between text-xl font-bold text-gray-900">
+              <span>Total</span>
+              <span>AED{amount}</span>
+            </div>
 
-          {/* Phone */}
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">
-              Customer Phone
-              <span className="text-red-500 ml-1">*</span>
-            </label>
-
-            <input
-              className="
-                w-full
-                border border-gray-300
-                rounded-xl
-                px-4 py-3
-                focus:ring-2 focus:ring-black focus:border-black
-              "
-              value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
-            />
-          </div>
-
-          {/* Payment Status */}
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">
-              Payment Status
-              <span className="text-red-500 ml-1">*</span>
-            </label>
-
-            <select
-              className="
-                w-full
-                border border-gray-300
-                rounded-xl
-                px-4 py-3
-              "
-              value={paymentStatus}
-              onChange={(e) => setPaymentStatus(e.target.value)}
+            <button
+              onClick={handleCreateOrder}
+              disabled={loading}
+              className="w-full bg-black hover:bg-gray-800 text-white py-3 rounded-lg font-medium transition"
             >
-              <option value="PAID">Paid</option>
-              <option value="PENDING">Pending</option>
-            </select>
-          </div>
-
-          {/* Payment Method */}
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">
-              Payment Method
-              <span className="text-red-500 ml-1">*</span>
-            </label>
-
-            <select
-              disabled={paymentStatus !== "PAID"}
-              className="
-                w-full
-                border border-gray-300
-                rounded-xl
-                px-4 py-3
-                disabled:bg-gray-100
-              "
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            >
-              <option>CASH</option>
-              <option>UPI</option>
-              <option>CARD</option>
-              <option>OTHER</option>
-            </select>
-          </div>
-
-          {/* Payment Ref */}
-          <div className="space-y-1 md:col-span-2">
-            <label className="text-sm font-medium text-gray-700">
-              Payment Reference
-            </label>
-
-            <input
-              disabled={paymentStatus !== "PAID"}
-              className="
-                w-full
-                border border-gray-300
-                rounded-xl
-                px-4 py-3
-                disabled:bg-gray-100
-              "
-              value={paymentRef}
-              onChange={(e) => setPaymentRef(e.target.value)}
-            />
+              {loading ? "Creating Order..." : "Create Order"}
+            </button>
           </div>
         </div>
-
-        {/* Order Summary */}
-        <div
-          className="
-          border border-gray-200
-          rounded-xl
-          p-5
-          bg-gradient-to-r from-gray-50 to-white
-          flex justify-between items-center
-        "
-        >
-          <div>
-            <p className="font-semibold text-gray-900">
-              {selectedProduct?.name || "No product selected"}
-            </p>
-
-            <p className="text-sm text-gray-500">
-              ₹{selectedProduct?.price || 0} × {quantity}
-            </p>
-          </div>
-
-          <div className="text-right">
-            <p className="text-xs text-gray-500">Total</p>
-
-            <p className="text-2xl font-bold text-gray-900">₹{amount}</p>
-          </div>
-        </div>
-
-        {/* Submit */}
-        <button
-          onClick={handleCreateOrder}
-          disabled={loading}
-          className="
-            w-full
-            bg-black
-            hover:bg-gray-900
-            text-white
-            py-3
-            rounded-xl
-            font-medium
-            transition
-            shadow
-          "
-        >
-          {loading ? "Creating Order..." : "Create Order"}
-        </button>
       </div>
     </div>
   );
 
   // return (
-  //   <div className="space-y-6">
-  //     {/* Header */}
+  //   <div className="max-w-6xl mx-auto p-6 space-y-6">
+  //     {/* HEADER */}
   //     <div>
-  //       <h2 className="text-2xl font-bold">New Order (POS)</h2>
+  //       <h1 className="text-3xl font-semibold text-gray-900">
+  //         Create New Order
+  //       </h1>
 
-  //       <p className="text-gray-600 text-sm">
-  //         Create store order with mandatory customer info
+  //       <p className="text-gray-500 text-sm">
+  //         Create POS order with customer and payment details
   //       </p>
   //     </div>
 
-  //     {/* Form */}
-  //     <div className="bg-white border shadow rounded-2xl p-5 space-y-4">
-  //       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-  //         {/* Product */}
-  //         <select
-  //           className="border rounded-xl px-3 py-2"
-  //           value={productId}
-  //           onChange={(e) => setProductId(e.target.value)}
-  //         >
-  //           <option value="">Select Product</option>
+  //     {/* MAIN GRID */}
+  //     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  //       {/* LEFT SIDE */}
+  //       <div className="lg:col-span-2 space-y-6">
+  //         {/* PRODUCT SECTION */}
+  //         <div className="bg-white border rounded-xl p-5 space-y-4 shadow-sm">
+  //           <h2 className="font-semibold text-lg">Product</h2>
 
-  //           {products.map((p) => (
-  //             <option key={p.id} value={p.id}>
-  //               {p.name} (Stock: {p.stock})
-  //             </option>
-  //           ))}
-  //         </select>
+  //           <select
+  //             value={productId}
+  //             onChange={(e) => setProductId(e.target.value)}
+  //             className="input"
+  //           >
+  //             <option value="">Select product</option>
 
-  //         {/* Quantity */}
-  //         <input
-  //           type="number"
-  //           min={1}
-  //           className="border rounded-xl px-3 py-2"
-  //           placeholder="Quantity"
-  //           value={quantity}
-  //           onChange={(e) => setQuantity(e.target.value)}
-  //         />
+  //             {products.map((p) => (
+  //               <option key={p.id} value={p.id}>
+  //                 {p.name} — ₹{p.price}
+  //               </option>
+  //             ))}
+  //           </select>
 
-  //         {/* Customer Name */}
-  //         <input
-  //           required
-  //           className="border rounded-xl px-3 py-2"
-  //           placeholder="Customer Name *"
-  //           value={customerName}
-  //           onChange={(e) => setCustomerName(e.target.value)}
-  //         />
+  //           {selectedProduct && (
+  //             <div className="flex gap-4 border rounded-lg p-4 bg-gray-50">
+  //               <img
+  //                 src={selectedProduct.thumbnail}
+  //                 className="w-20 h-20 object-cover rounded"
+  //               />
 
-  //         {/* Customer Email */}
-  //         <input
-  //           required
-  //           type="email"
-  //           className="border rounded-xl px-3 py-2"
-  //           placeholder="Customer Email *"
-  //           value={customerEmail}
-  //           onChange={(e) => setCustomerEmail(e.target.value)}
-  //         />
+  //               <div>
+  //                 <p className="font-semibold">{selectedProduct.name}</p>
 
-  //         {/* Customer Phone */}
-  //         <input
-  //           required
-  //           className="border rounded-xl px-3 py-2"
-  //           placeholder="Customer Phone *"
-  //           value={customerPhone}
-  //           onChange={(e) => setCustomerPhone(e.target.value)}
-  //         />
+  //                 <p className="text-sm text-gray-500">
+  //                   ₹{selectedProduct.price}
+  //                 </p>
 
-  //         {/* Payment Status */}
-  //         <select
-  //           className="border rounded-xl px-3 py-2"
-  //           value={paymentStatus}
-  //           onChange={(e) => setPaymentStatus(e.target.value)}
-  //         >
-  //           <option value="PAID">PAID</option>
+  //                 <p className="text-xs text-gray-400">
+  //                   Stock: {selectedProduct.stock}
+  //                 </p>
+  //               </div>
+  //             </div>
+  //           )}
 
-  //           <option value="PENDING">PENDING</option>
-  //         </select>
-
-  //         {/* Payment Method */}
-  //         <select
-  //           className="border rounded-xl px-3 py-2"
-  //           value={paymentMethod}
-  //           onChange={(e) => setPaymentMethod(e.target.value)}
-  //           disabled={paymentStatus !== "PAID"}
-  //         >
-  //           <option value="CASH">CASH</option>
-
-  //           <option value="UPI">UPI</option>
-
-  //           <option value="CARD">CARD</option>
-
-  //           <option value="OTHER">OTHER</option>
-  //         </select>
-
-  //         {/* Payment Ref */}
-  //         <input
-  //           className="border rounded-xl px-3 py-2 md:col-span-2"
-  //           placeholder="Payment Reference"
-  //           value={paymentRef}
-  //           onChange={(e) => setPaymentRef(e.target.value)}
-  //           disabled={paymentStatus !== "PAID"}
-  //         />
-  //       </div>
-
-  //       {/* Summary */}
-  //       <div className="bg-gray-50 border rounded-2xl p-4 flex justify-between">
-  //         <div>
-  //           <p className="font-semibold">
-  //             {selectedProduct?.name || "Select product"}
-  //           </p>
-
-  //           <p className="text-xs text-gray-600">
-  //             Price: ₹{selectedProduct?.price || 0}
-  //           </p>
+  //           <input
+  //             type="number"
+  //             min={1}
+  //             value={quantity}
+  //             onChange={(e) => setQuantity(Number(e.target.value))}
+  //             className="input"
+  //             placeholder="Quantity"
+  //           />
   //         </div>
 
-  //         <div className="text-right">
-  //           <p className="text-xs">Total</p>
+  //         {/* CUSTOMER SECTION */}
+  //         <div className="bg-white border rounded-xl p-5 space-y-4 shadow-sm">
+  //           <h2 className="font-semibold text-lg">Customer Information</h2>
 
-  //           <p className="text-xl font-bold">₹{amount}</p>
+  //           <div className="grid grid-cols-2 gap-4">
+  //             <input
+  //               className="input"
+  //               placeholder="First Name"
+  //               value={customerFirstName}
+  //               onChange={(e) => setCustomerFirstName(e.target.value)}
+  //             />
+
+  //             <input
+  //               className="input"
+  //               placeholder="Last Name"
+  //               value={customerLastName}
+  //               onChange={(e) => setCustomerLastName(e.target.value)}
+  //             />
+  //           </div>
+
+  //           <input
+  //             className="input"
+  //             placeholder="Email"
+  //             value={customerEmail}
+  //             onChange={(e) => setCustomerEmail(e.target.value)}
+  //           />
+
+  //           <div className="flex gap-2">
+  //             <input
+  //               className="w-24 input"
+  //               value={customerCountryCode}
+  //               onChange={(e) => setCustomerCountryCode(e.target.value)}
+  //             />
+
+  //             <input
+  //               className="flex-1 input"
+  //               placeholder="Phone Number"
+  //               value={customerPhoneNumber}
+  //               onChange={(e) => setCustomerPhoneNumber(e.target.value)}
+  //             />
+  //           </div>
+  //         </div>
+
+  //         {/* ADDRESS SECTION */}
+  //         <div className="bg-white border rounded-xl p-5 space-y-4 shadow-sm">
+  //           <h2 className="font-semibold text-lg">Address</h2>
+
+  //           <div className="grid grid-cols-2 gap-4">
+  //             <input
+  //               className="input"
+  //               placeholder="Country"
+  //               value={customerCountry}
+  //               onChange={(e) => setCustomerCountry(e.target.value)}
+  //             />
+
+  //             <input
+  //               className="input"
+  //               placeholder="State"
+  //               value={customerState}
+  //               onChange={(e) => setCustomerState(e.target.value)}
+  //             />
+
+  //             <input
+  //               className="input"
+  //               placeholder="City"
+  //               value={customerCity}
+  //               onChange={(e) => setCustomerCity(e.target.value)}
+  //             />
+  //           </div>
+
+  //           <textarea
+  //             className="input"
+  //             placeholder="Full Address"
+  //             value={customerAddress}
+  //             onChange={(e) => setCustomerAddress(e.target.value)}
+  //           />
+  //         </div>
+
+  //         {/* PAYMENT SECTION */}
+  //         <div className="bg-white border rounded-xl p-5 space-y-4 shadow-sm">
+  //           <h2 className="font-semibold text-lg">Payment</h2>
+
+  //           <select
+  //             className="input"
+  //             value={paymentStatus}
+  //             onChange={(e) => setPaymentStatus(e.target.value)}
+  //           >
+  //             <option value="PAID">Paid</option>
+  //             <option value="PENDING">Pending</option>
+  //           </select>
+
+  //           {paymentStatus === "PAID" && (
+  //             <>
+  //               <select
+  //                 className="input"
+  //                 value={paymentMethod}
+  //                 onChange={(e) => setPaymentMethod(e.target.value)}
+  //               >
+  //                 <option>CASH</option>
+  //                 <option>UPI</option>
+  //                 <option>CARD</option>
+  //                 <option>OTHER</option>
+  //               </select>
+
+  //               <input
+  //                 className="input"
+  //                 placeholder="Payment Reference"
+  //                 value={paymentRef}
+  //                 onChange={(e) => setPaymentRef(e.target.value)}
+  //               />
+  //             </>
+  //           )}
   //         </div>
   //       </div>
 
-  //       {/* Submit */}
-  //       <button
-  //         onClick={handleCreateOrder}
-  //         disabled={loading}
-  //         className="w-full bg-black text-white px-5 py-2 rounded-xl"
-  //       >
-  //         {loading ? "Creating..." : "Create Order"}
-  //       </button>
+  //       {/* RIGHT SIDE SUMMARY */}
+  //       <div className="bg-white border rounded-xl p-5 shadow-sm h-fit space-y-4">
+  //         <h2 className="font-semibold text-lg">Order Summary</h2>
+
+  //         <div className="flex justify-between">
+  //           <span>Product</span>
+  //           <span>{selectedProduct?.name || "-"}</span>
+  //         </div>
+
+  //         <div className="flex justify-between">
+  //           <span>Quantity</span>
+  //           <span>{quantity}</span>
+  //         </div>
+
+  //         <div className="border-t pt-3 flex justify-between font-semibold text-lg">
+  //           <span>Total</span>
+  //           <span>₹{amount}</span>
+  //         </div>
+
+  //         <button
+  //           onClick={handleCreateOrder}
+  //           disabled={loading}
+  //           className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition"
+  //         >
+  //           {loading ? "Creating Order..." : "Create Order"}
+  //         </button>
+  //       </div>
   //     </div>
   //   </div>
   // );
 }
+
+/*
+TAILWIND REUSABLE INPUT CLASS
+Add to globals.css
+*/

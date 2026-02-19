@@ -216,7 +216,9 @@ export default function DashboardLayout({ children }) {
           >
             Manage Categories
           </Link>
-
+          <Link href="/dashboard/artist" onClick={() => setSidebarOpen(false)}>
+            Manage Artists
+          </Link>
           <Link
             href="/dashboard/products"
             onClick={() => setSidebarOpen(false)}
@@ -239,7 +241,6 @@ export default function DashboardLayout({ children }) {
           <button
             onClick={handleLogout}
             className="text-red-600 hover:text-red-800 text-center mt-4 border-1"
-            p-2
           >
             Logout
           </button>

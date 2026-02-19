@@ -124,7 +124,7 @@ export default function PaymentStatusPage() {
           <h2 className="text-lg font-semibold">Order Details</h2>
 
           <p>
-            Product: <b>{order.Product?.name}</b>
+            Product: <b>{order.product?.name}</b>
           </p>
 
           <p>
@@ -140,7 +140,10 @@ export default function PaymentStatusPage() {
           </p>
 
           <p>
-            Customer: <b>{order.customerName}</b>
+            Customer:{" "}
+            <b>
+              {order.customerFirstName} {order.customerLastName}
+            </b>
           </p>
 
           <p>
@@ -148,7 +151,10 @@ export default function PaymentStatusPage() {
           </p>
 
           <p>
-            Phone: <b>{order.customerPhone}</b>
+            Phone:{" "}
+            <b>
+              {order.customerCountryCode} {order.customerPhoneNumber}
+            </b>
           </p>
         </div>
       )}

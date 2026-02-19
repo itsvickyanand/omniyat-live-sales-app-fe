@@ -14,6 +14,9 @@ export default function OrdersPage() {
 
   const fetchOrders = async () => {
     const res = await getAllOrders();
+    const sorted = (res.data || []).sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
     setOrders(res.data || []);
   };
 
@@ -129,7 +132,7 @@ export default function OrdersPage() {
                   <p className="font-semibold break-all">{o.id}</p>
 
                   <div className="mt-2 text-sm">
-                    <p className="font-semibold">{o?.Product?.name || "N/A"}</p>
+                    <p className="font-semibold">{o?.product?.name || "N/A"}</p>
                     <p className="text-gray-600 text-xs">
                       Qty: <b>{o.quantity}</b> • Amount: <b>AED {o.amount}</b>
                     </p>
@@ -138,10 +141,10 @@ export default function OrdersPage() {
 
                 {/* Thumbnail */}
                 <div className="w-16 h-16 rounded-xl border overflow-hidden bg-gray-50 shrink-0">
-                  {o?.Product?.thumbnail ? (
+                  {o?.product?.thumbnail ? (
                     <img
-                      src={o.Product.thumbnail}
-                      alt={o?.Product?.name}
+                      src={o.product.thumbnail}
+                      alt={o?.product?.name}
                       className="w-full h-full object-cover"
                     />
                   ) : (

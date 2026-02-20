@@ -855,13 +855,13 @@ export default function NewOrderPage() {
   const handleCreateOrder = async () => {
     if (!productId) return alert("Select product");
     if (!customerFirstName) return alert("First name required");
-    if (!customerLastName) return alert("Last name required");
+    // if (!customerLastName) return alert("Last name required");
     if (!isValidEmail(customerEmail)) return alert("Valid email required");
-    if (!customerPhoneNumber) return alert("Phone required");
-    if (!customerCountry) return alert("Country required");
-    if (!customerState) return alert("State required");
-    if (!customerCity) return alert("City required");
-    if (!customerAddress) return alert("Address required");
+    // if (!customerPhoneNumber) return alert("Phone required");
+    // if (!customerCountry) return alert("Country required");
+    // if (!customerState) return alert("State required");
+    // if (!customerCity) return alert("City required");
+    // if (!customerAddress) return alert("Address required");
 
     try {
       setLoading(true);

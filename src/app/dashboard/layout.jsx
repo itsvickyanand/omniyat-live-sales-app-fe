@@ -236,6 +236,18 @@ export default function DashboardLayout({ children }) {
           >
             Create POS/Admin order
           </Link>
+          <Link
+            href="/dashboard/ccavenuehistory"
+            onClick={() => setSidebarOpen(false)}
+          >
+            CCA Order Status
+          </Link>
+          <Link
+            href="/dashboard/ccavenueorderlookup"
+            onClick={() => setSidebarOpen(false)}
+          >
+            CCA Single Order Status
+          </Link>
 
           {/* Logout */}
           <button

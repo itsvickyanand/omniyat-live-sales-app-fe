@@ -932,11 +932,18 @@ export default function NewOrderPage() {
                 >
                   <option value="">Select product</option>
 
-                  {products.map((p) => (
+                  {/* {products.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name} — ₹{p.price}
                     </option>
-                  ))}
+                  ))} */}
+                  {products
+                    .filter((p) => p.stock > 0)
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} — ₹{p.price}
+                      </option>
+                    ))}
                 </select>
               </div>
 

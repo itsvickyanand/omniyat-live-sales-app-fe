@@ -99,7 +99,7 @@
 //         {/* Price + Stock row */}
 //         <div className="flex items-center justify-between mt-2">
 //           <p className="font-semibold text-lg text-gray-900">
-//             Price: ₹{Number(p.price).toLocaleString("en-IN")}
+//             Price: AED {Number(p.price).toLocaleString("en-IN")}
 //           </p>
 
 //           {/* <p
@@ -270,7 +270,7 @@ const ProductCard = ({
 
         <div className="flex items-center justify-between mt-2">
           <p className="font-semibold text-lg text-gray-900">
-            Price: ₹{Number(p.price || 0).toLocaleString("en-IN")}
+            Price: AED {Number(p.price || 0).toLocaleString("en-IN")}
           </p>
         </div>
       </div>
@@ -318,12 +318,12 @@ const ProductCard = ({
       {/* ACTION BUTTONS */}
 
       <div className="flex gap-2 mt-3">
-        <button
+        {/* <button
           onClick={() => handleBuyNow(p.id)}
           className="flex-1 bg-black text-white py-1 rounded hover:bg-gray-900"
         >
           Buy Now
-        </button>
+        </button> */}
 
         <button
           onClick={() => handleStartEdit(p)}

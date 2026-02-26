@@ -1348,7 +1348,7 @@ export default function ProductsPage() {
 //                   {/* Price + Stock row */}
 //                   <div className="flex items-center justify-between mt-2">
 //                     <p className="font-semibold text-lg text-gray-900">
-//                       ₹{Number(p.price).toLocaleString("en-IN")}
+//                       AED {Number(p.price).toLocaleString("en-IN")}
 //                     </p>
 
 //                     <p

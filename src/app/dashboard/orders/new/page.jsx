@@ -149,7 +149,7 @@
 
 //               {products.map((p) => (
 //                 <option key={p.id} value={p.id}>
-//                   {p.name} • ₹{p.price} • Stock: {p.stock}
+//                   {p.name} • AED {p.price} • Stock: {p.stock}
 //                 </option>
 //               ))}
 //             </select>
@@ -398,14 +398,14 @@
 //             </p>
 
 //             <p className="text-sm text-gray-500">
-//               ₹{selectedProduct?.price || 0} × {quantity}
+//               AED {selectedProduct?.price || 0} × {quantity}
 //             </p>
 //           </div>
 
 //           <div className="text-right">
 //             <p className="text-xs text-gray-500">Total</p>
 
-//             <p className="text-2xl font-bold text-gray-900">₹{amount}</p>
+//             <p className="text-2xl font-bold text-gray-900">AED {amount}</p>
 //           </div>
 //         </div>
 
@@ -626,7 +626,7 @@
 
 //           {products.map((p) => (
 //             <option key={p.id} value={p.id}>
-//               {p.name} • ₹{p.price}
+//               {p.name} • AED {p.price}
 //             </option>
 //           ))}
 //         </select>
@@ -722,7 +722,7 @@
 //         </select>
 
 //         {/* TOTAL */}
-//         <div className="text-xl font-bold">Total: ₹{amount}</div>
+//         <div className="text-xl font-bold">Total: AED {amount}</div>
 
 //         {/* SUBMIT */}
 //         <button
@@ -934,14 +934,14 @@ export default function NewOrderPage() {
 
                   {/* {products.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name} — ₹{p.price}
+                      {p.name} — AED {p.price}
                     </option>
                   ))} */}
                   {products
                     .filter((p) => p.stock > 0)
                     .map((p) => (
                       <option key={p.id} value={p.id}>
-                        {p.name} — ₹{p.price}
+                        {p.name} — AED {p.price}
                       </option>
                     ))}
                 </select>
@@ -960,7 +960,7 @@ export default function NewOrderPage() {
                     </p>
 
                     <p className="text-gray-600 text-sm">
-                      Price: ₹{selectedProduct.price}
+                      Price: AED {selectedProduct.price}
                     </p>
 
                     <p className="text-xs text-gray-500">
@@ -1184,7 +1184,7 @@ export default function NewOrderPage() {
 
   //             {products.map((p) => (
   //               <option key={p.id} value={p.id}>
-  //                 {p.name} — ₹{p.price}
+  //                 {p.name} — AED {p.price}
   //               </option>
   //             ))}
   //           </select>
@@ -1200,7 +1200,7 @@ export default function NewOrderPage() {
   //                 <p className="font-semibold">{selectedProduct.name}</p>
 
   //                 <p className="text-sm text-gray-500">
-  //                   ₹{selectedProduct.price}
+  //                   AED {selectedProduct.price}
   //                 </p>
 
   //                 <p className="text-xs text-gray-400">
@@ -1351,7 +1351,7 @@ export default function NewOrderPage() {
 
   //         <div className="border-t pt-3 flex justify-between font-semibold text-lg">
   //           <span>Total</span>
-  //           <span>₹{amount}</span>
+  //           <span>AED {amount}</span>
   //         </div>
 
   //         <button

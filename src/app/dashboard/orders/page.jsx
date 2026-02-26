@@ -11,13 +11,67 @@ import {
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [paidfilter, setpaidfilter] = useState(false);
   const fetchOrders = async () => {
     const res = await getAllOrders();
     const sorted = (res.data || []).sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
     setOrders(res.data || []);
+  };
+
+  const exportOrdersToCSV = () => {
+    if (!orders || orders.length === 0) {
+      alert("No orders to export");
+      return;
+    }
+
+    const rows = orders.map((o) => ({
+      OrderID: o.id,
+      ProductName: o.product?.name || "",
+      ProductPrice: o.product?.price || "",
+      Quantity: o.quantity,
+      Amount: o.amount,
+      PaymentMode: o.paymentMode,
+      PaymentStatus: o.paymentStatus,
+      PaymentMethod: o.paymentMethod || "",
+      Status: o.status,
+      GatewayOrderId: o.gatewayOrderId || "",
+      GatewayTrackingId: o.gatewayTrackingId || "",
+      CustomerName: `${o.customerFirstName || ""} ${o.customerLastName || ""}`,
+      CustomerEmail: o.customerEmail || "",
+      CustomerPhone: `${o.customerCountryCode || ""} ${
+        o.customerPhoneNumber || ""
+      }`,
+      Country: o.customerCountry || "",
+      State: o.customerState || "",
+      City: o.customerCity || "",
+      Address: o.customerAddress || "",
+      CreatedAt: o.createdAt,
+    }));
+
+    const headers = Object.keys(rows[0]).join(",");
+
+    const csvRows = rows.map((row) =>
+      Object.values(row)
+        .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+        .join(",")
+    );
+
+    const csvContent = [headers, ...csvRows].join("\n");
+
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `orders-${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   useEffect(() => {
@@ -103,18 +157,43 @@ export default function OrdersPage() {
             Manage POS orders (cancel / mark paid / delete) ✅
           </p>
         </div>
-
+        {/* <button
+          onClick={() => setpaidfilter(!paidfilter)}
+          disabled={loading}
+          className="w-fit px-4 py-2 cursor-pointer rounded-xl bg-black text-white text-sm disabled:opacity-50"
+        >
+          {loading ? "Loading..." : "Check Paid Orders"}
+        </button> */}
+        <button
+          onClick={() => setpaidfilter(!paidfilter)}
+          disabled={loading}
+          className={`w-fit px-5 py-2 rounded-full cursor-pointer text-sm font-medium transition-all duration-200 border
+            ${
+              paidfilter
+                ? "bg-black text-white border-black shadow-md"
+                : "bg-white text-black border-black"
+            }
+          `}
+        >
+          {loading ? "Loading..." : "Check Paid Orders"}
+        </button>
+        <button
+          onClick={exportOrdersToCSV}
+          className="w-fit px-5 py-2 rounded-full border border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition-all duration-200"
+        >
+          Export CSV
+        </button>
         <button
           onClick={fetchOrders}
           disabled={loading}
-          className="w-fit px-4 py-2 rounded-xl bg-black text-white text-sm disabled:opacity-50"
+          className="w-fit px-4 py-2 rounded-xl cursor-pointer bg-black text-white text-sm disabled:opacity-50"
         >
           {loading ? "Loading..." : "Refresh"}
         </button>
       </div>
 
       {/* Orders List */}
-      {orders.length === 0 ? (
+      {/* {orders.length === 0 ? (
         <div className="bg-white border rounded-2xl shadow p-6 text-gray-500">
           No orders found
         </div>
@@ -124,7 +203,23 @@ export default function OrdersPage() {
             <div
               key={o.id}
               className="bg-white border rounded-2xl shadow p-4 flex flex-col gap-3"
+            > */}
+      {(paidfilter ? orders.filter((o) => o.paymentStatus === "PAID") : orders)
+        .length === 0 ? (
+        <div className="bg-white border rounded-2xl shadow p-6 text-gray-500">
+          No orders found
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          {(paidfilter
+            ? orders.filter((o) => o.paymentStatus === "PAID")
+            : orders
+          ).map((o) => (
+            <div
+              key={o.id}
+              className="bg-white border rounded-2xl shadow p-4 flex flex-col gap-3"
             >
+              {/* Your existing card content continues here */}
               {/* Top */}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -177,7 +272,7 @@ export default function OrdersPage() {
               </div>
 
               {/* Customer */}
-              <div className="text-xs text-gray-600 space-y-1">
+              {/* <div className="text-xs text-gray-600 space-y-1">
                 <p>
                   Customer: <b>{o.customerName || "Walk-in"}</b>
                 </p>
@@ -185,6 +280,44 @@ export default function OrdersPage() {
                 {o.customerPhone && <p>Phone: {o.customerEmail}</p>}
                 {o.paymentMethod && <p>Method: {o.paymentMethod}</p>}
 
+                {o.paymentRef && <p>Ref: {o.paymentRef}</p>}
+              </div> */}
+              <div className="text-xs text-gray-600 space-y-1">
+                <p>
+                  Customer:{" "}
+                  <b>
+                    {o.customerFirstName
+                      ? `${o.customerFirstName} ${o.customerLastName || ""}`
+                      : "Walk-in"}
+                  </b>
+                </p>
+
+                {o.customerEmail && <p>Email: {o.customerEmail}</p>}
+
+                {o.customerPhoneNumber && (
+                  <p>
+                    Phone: {o.customerCountryCode} {o.customerPhoneNumber}
+                  </p>
+                )}
+
+                {(o.customerAddress ||
+                  o.customerCity ||
+                  o.customerState ||
+                  o.customerCountry) && (
+                  <p>
+                    Address:{" "}
+                    {[
+                      o.customerAddress,
+                      o.customerCity,
+                      o.customerState,
+                      o.customerCountry,
+                    ]
+                      .filter(Boolean)
+                      .join(", ")}
+                  </p>
+                )}
+
+                {o.paymentMethod && <p>Method: {o.paymentMethod}</p>}
                 {o.paymentRef && <p>Ref: {o.paymentRef}</p>}
               </div>
 
@@ -210,13 +343,13 @@ export default function OrdersPage() {
                   </button>
                 )}
 
-                <button
+                {/* <button
                   onClick={() => handleDeleteOrder(o.id)}
                   disabled={loading}
                   className="flex-1 px-3 py-2 rounded-xl text-sm bg-black text-white hover:opacity-90 disabled:opacity-50"
                 >
                   Delete
-                </button>
+                </button> */}
               </div>
             </div>
           ))}

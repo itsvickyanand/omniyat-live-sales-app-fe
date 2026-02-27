@@ -26,7 +26,10 @@ export default function OrdersPage() {
       return;
     }
 
-    const rows = orders.map((o) => ({
+    // const rows = orders.map((o) => ({
+    const rows = (
+      paidfilter ? orders.filter((o) => o.paymentStatus === "PAID") : orders
+    ).map((o) => ({
       OrderID: o.id,
       ProductName: o.product?.name || "",
       ProductPrice: o.product?.price || "",
